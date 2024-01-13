@@ -1,12 +1,36 @@
+import axios from '../node_modules/axios/index';
+import { useEffect, useState } from 'react'
 import './App.css'
 
-function App() {
+interface Restaurant {
+  name: string;
+  address: string;
+}
 
+const URL = "https://recruiting-datasets.s3.us-east-2.amazonaws.com/data_melp.json"
+
+function App() {
+  const [restaurantsData, setRestaurantsData] = useState<Restaurant[]>([]);
+  
+  const fetchData = () => {
+    axios.get(URL)
+    .then((response) => response.data)
+    .then((res) => {
+      setRestaurantsData(res);
+    })
+    .catch((error) => {
+      console.error("Error fetching data:", error);
+    });
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [])
+
+  console.log('ooo restaurants', restaurantsData)
   return (
     <>
-      <div>
-        <h1>Vite + React</h1>
-      </div>
+      <h1>TEST - EDT</h1>
     </>
   )
 }

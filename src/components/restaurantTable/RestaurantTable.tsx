@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './style.css'
 
 interface Restaurant {
@@ -24,9 +24,12 @@ interface Restaurant {
 
 interface RestaurantTableProps {
   restaurantsData: Restaurant[];
+  selectedPoint: number[];
+  radius: number;
 }
 
-const RestaurantTable: React.FC<RestaurantTableProps> = ({ restaurantsData }) => {
+const RestaurantTable: React.FC<RestaurantTableProps> = ({ restaurantsData, selectedPoint, radius }) => {
+  const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>(restaurantsData);
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
@@ -35,21 +38,64 @@ const RestaurantTable: React.FC<RestaurantTableProps> = ({ restaurantsData }) =>
     setSortOrder((prevOrder) => (prevOrder === 'asc' ? 'desc' : 'asc'));
   };
 
-  const sortedData = sortBy
-  ? [...restaurantsData].sort((a, b) => {
-      const isDescending = sortBy.startsWith('-');
-      const actualKey = isDescending ? sortBy.slice(1) : sortBy;
+  useEffect(() => {
+    const filterRestaurants = () => {
+      const filtered = restaurantsData.filter((restaurant) => {
+        const distance = calculateDistance(
+          selectedPoint[0],
+          selectedPoint[1],
+          restaurant.address.location.lat,
+          restaurant.address.location.lng
+        );
+        return distance <= radius;
+      });
+      const sorted = sortRestaurants(filtered);
+      setFilteredRestaurants(sorted);
+    };
 
-      const aValue = a[actualKey];
-      const bValue = b[actualKey];
+    filterRestaurants();
+  }, [selectedPoint, radius, restaurantsData, sortBy]);
 
-      if (typeof aValue === 'number' && typeof bValue === 'number') {
-        return isDescending ? bValue - aValue : aValue - bValue;
-      } else {
-        return isDescending ? bValue.localeCompare(aValue) : aValue.localeCompare(bValue);
-      }
-    })
-  : restaurantsData;
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371e3;
+  
+    const phi1 = toRadians(lat1);
+    const phi2 = toRadians(lat2);
+    const deltaPhi = toRadians(lat2 - lat1);
+    const deltaLambda = toRadians(lon2 - lon1);
+  
+    const a =
+      Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+      Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+  
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  
+    const distance = R * c;
+  
+    return distance;
+  };
+  
+  const toRadians = (degrees: number) => {
+    return degrees * (Math.PI / 180);
+  };
+
+  const sortRestaurants = (data: Restaurant[]) => {
+    return sortBy
+      ? [...data].sort((a, b) => {
+          const isDescending = sortBy.startsWith('-');
+          const actualKey = isDescending ? sortBy.slice(1) : sortBy;
+
+          const aValue = a[actualKey];
+          const bValue = b[actualKey];
+
+          if (typeof aValue === 'number' && typeof bValue === 'number') {
+            return isDescending ? bValue - aValue : aValue - bValue;
+          } else {
+            return isDescending ? bValue.localeCompare(aValue) : aValue.localeCompare(bValue);
+          }
+        })
+      : data;
+  };
 
   return (
     <table>
@@ -67,7 +113,7 @@ const RestaurantTable: React.FC<RestaurantTableProps> = ({ restaurantsData }) =>
         </tr>
       </thead>
       <tbody>
-        {sortedData.map((restaurant) => (
+        {filteredRestaurants.map((restaurant) => (
           <tr key={restaurant.id}>
             <td>{restaurant.id}</td>
             <td>{restaurant.name}</td>

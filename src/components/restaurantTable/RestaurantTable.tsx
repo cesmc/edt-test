@@ -85,13 +85,15 @@ const RestaurantTable: React.FC<RestaurantTableProps> = ({ restaurantsData, sele
           const isDescending = sortBy.startsWith('-');
           const actualKey = isDescending ? sortBy.slice(1) : sortBy;
 
-          const aValue = a[actualKey];
-          const bValue = b[actualKey];
+          const aValue = a[actualKey as keyof Restaurant];
+          const bValue = b[actualKey as keyof Restaurant]; 
 
           if (typeof aValue === 'number' && typeof bValue === 'number') {
             return isDescending ? bValue - aValue : aValue - bValue;
-          } else {
+          } else if (typeof aValue === 'string' && typeof bValue === 'string') {
             return isDescending ? bValue.localeCompare(aValue) : aValue.localeCompare(bValue);
+          } else {
+            return 0;
           }
         })
       : data;

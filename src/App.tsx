@@ -10,7 +10,7 @@ function App() {
   const [restaurantsData, setRestaurantsData] = useState([]);
   const centroMexico = [19.4326, -99.1332];
   const [selectedPoint, setSelectedPoint] = useState(centroMexico);
-  const [radius, setRadius] = useState(1500);
+  const [radius, setRadius] = useState<number>(1500);
   
   const fetchData = () => {
     axios.get(URL)

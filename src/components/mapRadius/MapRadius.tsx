@@ -2,22 +2,37 @@ import { useRef, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
+interface RestaurantData {
+  id: string;
+  name: string;
+  address: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+    street: string;
+    city: string;
+    state: string;
+  };
+}
 interface MapRadiusProps {
   selectedPoint: number[];
-  setSelectedPoint: any;
+  setSelectedPoint: React.Dispatch<React.SetStateAction<number[]>>;
   radius: number;
-  setRadius: any;
+  setRadius: React.Dispatch<React.SetStateAction<number>>;
   centroMexico: number[];
-  restaurantsData: string[];
+  restaurantsData: RestaurantData[];
 }
 
 const MapRadius: React.FC<MapRadiusProps> = ({ selectedPoint, setSelectedPoint, radius, setRadius, centroMexico, restaurantsData }) => {
-  const mapRef = useRef<null>(null);
+  const mapRef = useRef<any>(null);
 
-  const handleMapClick = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedPoint([e.latlng.lat, e.latlng.lng]);
+  const handleMapClick = (e: React.MouseEvent) => {
+    const latlng = (e as any).latlng;
+    if (latlng) {
+      setSelectedPoint([latlng.lat, latlng.lng]);
+    }
   };
-
   const handleRadiusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newRadius = parseFloat(event.target.value);
     if (!isNaN(newRadius)) {
@@ -65,7 +80,7 @@ const MapRadius: React.FC<MapRadiusProps> = ({ selectedPoint, setSelectedPoint, 
       <MapContainer center={centroMexico} zoom={6} style={{ height: '500px', width: '100%' }} ref={mapRef}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          // attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <Marker position={selectedPoint}>
           <Popup>

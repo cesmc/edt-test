@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 // import L from 'leaflet'
 import 'leaflet/dist/leaflet.css';
@@ -8,13 +8,11 @@ interface MapRadiusProps {
   setSelectedPoint: any;
   radius: number;
   setRadius: any;
-  centroMexico: any;
+  centroMexico: number[];
+  restaurantsData: string[];
 }
 
-const MapRadius: React.FC<MapRadiusProps> = ({ selectedPoint, setSelectedPoint, radius, setRadius, centroMexico }) => {
-  // const centroMexico = [23.6345, -102.5528];
-  // const [selectedPoint, setSelectedPoint] = useState(centroMexico);
-  // const [radius, setRadius] = useState(50000);
+const MapRadius: React.FC<MapRadiusProps> = ({ selectedPoint, setSelectedPoint, radius, setRadius, centroMexico, restaurantsData }) => {
   const mapRef = useRef<MapContainer | null>(null);
 
   const handleMapClick = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,6 +38,29 @@ const MapRadius: React.FC<MapRadiusProps> = ({ selectedPoint, setSelectedPoint, 
     };
   }, [handleMapClick]);
 
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371e3;
+  
+    const phi1 = toRadians(lat1);
+    const phi2 = toRadians(lat2);
+    const deltaPhi = toRadians(lat2 - lat1);
+    const deltaLambda = toRadians(lon2 - lon1);
+  
+    const a =
+      Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+      Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+  
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  
+    const distance = R * c;
+  
+    return distance;
+  };
+  
+  const toRadians = (degrees: number) => {
+    return degrees * (Math.PI / 180);
+  };
+
   return (
     <div>
       <MapContainer center={centroMexico} zoom={6} style={{ height: '500px', width: '100%' }} ref={mapRef}>
@@ -53,6 +74,25 @@ const MapRadius: React.FC<MapRadiusProps> = ({ selectedPoint, setSelectedPoint, 
           </Popup>
         </Marker>
         <Circle center={selectedPoint} radius={radius} />
+        {restaurantsData.map((restaurant) => {
+          const distance = calculateDistance(
+            selectedPoint[0],
+            selectedPoint[1],
+            restaurant.address.location.lat,
+            restaurant.address.location.lng
+          );
+          if (distance <= radius) {
+            return (
+              <Marker key={restaurant.id} position={[restaurant.address.location.lat, restaurant.address.location.lng]}>
+                <Popup>
+                  {restaurant.name} <br />
+                  {`${restaurant.address.street}, ${restaurant.address.city}, ${restaurant.address.state}`}
+                </Popup>
+              </Marker>
+            );
+          }
+          return null;
+        })}
       </MapContainer>
       <div>
       <label htmlFor="radiusInput">Radio (metros): </label>

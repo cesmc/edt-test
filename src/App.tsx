@@ -36,6 +36,7 @@ function App() {
         radius={radius}
         setRadius={setRadius}
         centroMexico={centroMexico}
+        restaurantsData={restaurantsData}
       />
       <RestaurantTable 
         restaurantsData={restaurantsData}

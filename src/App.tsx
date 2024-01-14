@@ -1,5 +1,6 @@
 import axios from '../node_modules/axios/index';
 import { useEffect, useState } from 'react'
+import RestaurantTable from './components/restaurantTable/RestaurantTable';
 import './App.css'
 
 interface Restaurant {
@@ -31,6 +32,7 @@ function App() {
   return (
     <>
       <h1>TEST - EDT</h1>
+      <RestaurantTable restaurantsData={restaurantsData}/>
     </>
   )
 }

@@ -1,8 +1,22 @@
+th {
+  border: 1px solid #ccc;
+  padding: 16px;
+  border-radius: 8px;
+  margin: 16px;
+  background-color: #65B741;
+  color: white;
+  min-width: 100px;
+}
 
-th, td {
+td {
   border: 1px solid #ccc;
   padding: 16px;
   border-radius: 8px;
   margin: 16px;
 }
 
+.sort-button:hover {
+  background-color: #2f5a1d;
+  cursor: pointer;
+  color:#ccc;
+}

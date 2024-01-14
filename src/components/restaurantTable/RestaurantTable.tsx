@@ -18,6 +18,7 @@ interface Restaurant {
       lat: number;
       lng: number;
     };
+    actualKey: Array<number>;
   };
 }
 
@@ -27,22 +28,42 @@ interface RestaurantTableProps {
 
 const RestaurantTable: React.FC<RestaurantTableProps> = ({ restaurantsData }) => {
   const [sortBy, setSortBy] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const handleSort = (key: string) => {
-    setSortBy(key);
+    setSortBy((prevSortBy) => (prevSortBy === key ? `-${key}` : key));
+    setSortOrder((prevOrder) => (prevOrder === 'asc' ? 'desc' : 'asc'));
   };
 
-  const sortedData = sortBy ? [...restaurantsData].sort((a, b) => (a[sortBy] > b[sortBy] ? 1 : -1)) : restaurantsData;
+  const sortedData = sortBy
+  ? [...restaurantsData].sort((a, b) => {
+      const isDescending = sortBy.startsWith('-');
+      const actualKey = isDescending ? sortBy.slice(1) : sortBy;
+
+      const aValue = a[actualKey];
+      const bValue = b[actualKey];
+
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return isDescending ? bValue - aValue : aValue - bValue;
+      } else {
+        return isDescending ? bValue.localeCompare(aValue) : aValue.localeCompare(bValue);
+      }
+    })
+  : restaurantsData;
 
   return (
     <table>
       <thead>
         <tr>
           <th>ID</th>
-          <th onClick={() => handleSort('name')}>Nombre</th>
+          <th className="sort-button" onClick={() => handleSort('name')}>
+            Nombre {sortBy?.includes('name') && (sortOrder === 'asc' ? '▲' : '▼')}
+          </th>
           <th>Contacto</th>
           <th>Dirección</th>
-          <th onClick={() => handleSort('rating')}>Rating</th>
+          <th className="sort-button" onClick={() => handleSort('rating')}>
+            Rating {sortBy?.includes('rating') && (sortOrder === 'asc' ? '▲' : '▼')}
+          </th>
         </tr>
       </thead>
       <tbody>

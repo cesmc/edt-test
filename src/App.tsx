@@ -3,15 +3,10 @@ import { useEffect, useState } from 'react'
 import RestaurantTable from './components/restaurantTable/RestaurantTable';
 import './App.css'
 
-interface Restaurant {
-  name: string;
-  address: string;
-}
-
 const URL = "https://recruiting-datasets.s3.us-east-2.amazonaws.com/data_melp.json"
 
 function App() {
-  const [restaurantsData, setRestaurantsData] = useState<Restaurant[]>([]);
+  const [restaurantsData, setRestaurantsData] = useState([]);
   
   const fetchData = () => {
     axios.get(URL)

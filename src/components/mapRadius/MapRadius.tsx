@@ -12,7 +12,7 @@ interface MapRadiusProps {
 }
 
 const MapRadius: React.FC<MapRadiusProps> = ({ selectedPoint, setSelectedPoint, radius, setRadius, centroMexico, restaurantsData }) => {
-  const mapRef = useRef<MapContainer | null>(null);
+  const mapRef = useRef<null>(null);
 
   const handleMapClick = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedPoint([e.latlng.lat, e.latlng.lng]);

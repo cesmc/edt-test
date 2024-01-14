@@ -1,6 +1,7 @@
 {
   "name": "edt-test",
   "private": true,
+  "homepage": "https://cesmc.github.io/edt-test/",
   "version": "0.0.0",
   "type": "module",
   "scripts": {

@@ -87,7 +87,8 @@ const MapRadius: React.FC<MapRadiusProps> = ({ selectedPoint, setSelectedPoint, 
             Punto seleccionado: <br /> {`${selectedPoint[0]}, ${selectedPoint[1]}`}
           </Popup>
         </Marker>
-        <Circle center={selectedPoint} />
+        {/* @ts-ignore */}
+        <Circle center={selectedPoint} radius={radius} />
         {restaurantsData.map((restaurant) => {
           const distance = calculateDistance(
             selectedPoint[0],
